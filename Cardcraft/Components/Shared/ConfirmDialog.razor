@@ -1,0 +1,34 @@
+﻿<div class="confirm-dialog-container" style="display:@(IsVisible ? "flex" : "none")" @onmouseleave="OnMouseLeave">
+    <div class="fs-5 text-white text-shadow">@Message</div>
+    <span class="confirm-dialog-buttons d-flex justify-content-between align-items-center gap-4">
+        <button type="submit" class="btn btn-danger bi bi-check-lg rounded-circle zoom-in fs-3" @onclick="ConfirmDeleteClick"></button>
+        <button type="button" class="btn btn-secondary bi bi-x-lg rounded-circle zoom-in fs-3" @onclick="CancelDeleteClick"></button>
+    </span>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; } = true;
+
+    [Parameter]
+    public string? Message { get; set; }
+
+    [Parameter]
+    public EventCallback OnConfirmClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnMouseLeave { get; set; }
+
+    private async Task ConfirmDeleteClick()
+    {
+        await OnConfirmClick.InvokeAsync();
+    }
+
+    private async Task CancelDeleteClick()
+    {
+        await OnCancelClick.InvokeAsync();
+    }
+}

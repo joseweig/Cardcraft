@@ -1,0 +1,26 @@
+@if (IsVisible)
+{
+    <div class="modal-backdrop">
+        <div class="modal-content">
+            <h2>Error</h2>
+            <p>@ErrorMessage</p>
+            <button @onclick="HideModal">Close</button>
+        </div>
+    </div>
+}
+
+@code {
+    public bool IsVisible { get; set; }
+    public string ErrorMessage { get; set; }
+
+    public void ShowModal(string message)
+    {
+        ErrorMessage = message;
+        IsVisible = true;
+    }
+
+    private void HideModal()
+    {
+        IsVisible = false;
+    }
+}

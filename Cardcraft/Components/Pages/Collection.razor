@@ -1,0 +1,157 @@
+﻿@page "/"
+@page "/collection"
+@inject ICardService cardService
+@inject ToastService toastService
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Collection</PageTitle>
+
+@if (cardCollection is null)
+{
+    <span>Loading...</span>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="tool-bar d-flex align-items-center mb-3">
+            <div class="me-2">
+                <button type="button" class="btn btn-primary" @onclick="NewCardClick" disabled="@creatingNew">New Card</button>
+            </div>
+            <div class="me-2 text-red fw-bold">
+                @errorMsg
+            </div>
+        </div>
+
+        <div class="row">
+            @if (creatingNew) {
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <GameCard 
+                        EditMode="true" 
+                        OnUpdate="OnUpdateHandler"
+                        OnCreate="OnCreateHandler"
+                        OnCancelEdit="OnCancelEditHandler"
+                        OnCardImageUpdated="OnCardImageUpdatedHandler"
+                        OnError="OnErrorHandler"
+                    />
+                </div>
+            }
+
+            @foreach (var card in cardCollection.Where(c => c.IsActive))
+            {
+                <div class="col-lg-3 col-md-6 mb-4">
+                    @if (card.Id == editingId)
+                    {
+                        <GameCard 
+                            EditMode="true" 
+                            Id="card.Id" 
+                            gameCard="card"
+                            OnUpdate="OnUpdateHandler"
+                            OnCreate="OnCreateHandler"
+                            OnCancelEdit="OnCancelEditHandler"
+                            OnError="OnErrorHandler"
+                        />
+                    }
+                    else
+                    {
+                        <GameCard 
+                            EditMode="false"
+                            Id="card.Id"
+                            gameCard="card"
+                            NewlyCreated="@card.NewImageCreated"
+                            OnEditClick="OnEditClickHandler" 
+                            OnDeleteClick="OnDeleteClickHandler"
+                            OnError="OnErrorHandler"
+                        />
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    #pragma warning disable RZ10012
+
+    public List<Card>? cardCollection = null;
+
+    public int editingId = -1;
+
+    public bool creatingNew = false;
+
+    public string errorMsg = string.Empty;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadCards();
+    }
+
+    public async Task LoadCards()
+    {
+        var result = await cardService.GetAllCardsAsync();
+        cardCollection = result.ToList();
+    }
+
+    private void OnUpdateHandler(bool isSuccessful)
+    {
+        if (isSuccessful) editingId = -1;
+    }
+
+    private void OnCreateHandler(Card gameCard)
+    {
+        if (gameCard is not null)
+        {
+            cardCollection?.Insert(0, gameCard);
+            creatingNew = false;
+        }
+    }
+
+    private void OnCancelEditHandler(bool IsCreating)
+    {
+        if (IsCreating)
+        {
+            creatingNew = false;
+        }
+        else
+        {
+            editingId = -1;
+        }
+    }
+
+    private void OnEditClickHandler(int id)
+    {
+        editingId = id;
+    }
+
+    private void OnDeleteClickHandler(Card gameCard)
+    {
+        if (gameCard is not null)
+        {
+            var cardToDelete = cardCollection?.FirstOrDefault(card => card.Id == gameCard.Id);
+            if (cardToDelete is not null)
+            {
+                cardCollection?.Remove(gameCard);
+            }
+        }
+    }
+
+    private void OnCardImageUpdatedHandler(Card gameCard)
+    {
+        var cardToUpdate = cardCollection?.FirstOrDefault(card => card.Id == gameCard.Id);
+        if (cardToUpdate is not null)
+        {
+            cardToUpdate.Image = gameCard.Image;
+            StateHasChanged();
+        }
+    }
+
+    private void OnErrorHandler(string error)
+    {
+        toastService.ShowToast(error, ToastLevel.Error);
+    }
+
+    private void NewCardClick()
+    {
+        creatingNew = true;
+        editingId = -1;
+    }
+}

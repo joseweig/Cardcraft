@@ -1,0 +1,25 @@
+﻿@page "/settings"
+@rendermode InteractiveServer
+@inject ApiKeyService apiKeyService
+
+<label class="fw-bold">API Key</label>
+<input @bind="apiKey" @oninput="HandleInputChange" class="w-100" />
+<span>
+    To generate card images, Cardcraft uses OpenAI's Dall-E-3 model. Therefore an OpenAI API Key is required. API Keys are only stored in memory for security, but you will have to provide the key on every session.
+</span>
+
+
+@code {
+    private string apiKey;
+
+    protected override Task OnInitializedAsync()
+    {
+        this.apiKey = apiKeyService.ApiKey;
+        return base.OnInitializedAsync();
+    }
+
+    private void HandleInputChange(ChangeEventArgs e)
+    {
+        apiKeyService.ApiKey = e.Value.ToString();
+    }
+}

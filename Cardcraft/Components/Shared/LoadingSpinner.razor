@@ -1,0 +1,8 @@
+﻿<div class="spinner-container" style="display:@(IsVisible ? "flex" : "none")">
+    <div class="loading-spinner"></div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; } = true;
+}

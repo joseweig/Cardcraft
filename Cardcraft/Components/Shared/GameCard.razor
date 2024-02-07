@@ -1,0 +1,309 @@
+﻿@inject ICardService CardService
+@inject IAIService OpenAIService
+@inject IImageStoreService ImageService
+@rendermode InteractiveServer
+
+@if (EditMode)
+{
+    <EditForm Model="gameCard" FormName="EditCardForm" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <div class="game-card edit-card card-shadow zoom-card card border-0" style="background-image: url('@gameCard.Image');">
+            @if (ShowLoadingSpinner)
+            {
+                <LoadingSpinner IsVisible=@ShowLoadingSpinner />
+            }
+            else
+            {
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center gap-2">
+                    <InputText id="@nameof(gameCard.Name)" @bind-Value="gameCard.Name" class="form-control" placeholder="@nameof(gameCard.Name)" title="@nameof(gameCard.Name)"></InputText>
+                    <InputNumber @bind-Value="gameCard.Cost" class="form-control" min="0" max="12" title="@nameof(gameCard.Cost)"></InputNumber>
+                </div>
+                <div class="card-body text-wrap overflow-hidden flex-fill bg-transparent">
+                    <InputTextArea id="@nameof(gameCard.Description)" @bind-Value="gameCard.Description" class="form-control h-100" placeholder="@nameof(gameCard.Description)" style="resize: none;" />
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center gap-2">
+                    <InputSelect id="@nameof(gameCard.Family)" @bind-Value="gameCard.Family" class="form-control" title="@nameof(gameCard.Family)">
+                        @foreach (var option in Enum.GetValues(typeof(Data.Enums.FamilyType)))
+                        {
+                            <option value="@option">@option</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center gap-2">
+                    <span class="text-white fw-bold fs-3 text-shadow d-flex justify-content-between align-items-center gap-2">
+                        <InputNumber id="@nameof(gameCard.Attack)" @bind-Value="gameCard.Attack" class="form-control" min="0" max="12" title="@nameof(gameCard.Attack)"></InputNumber>
+                        <InputNumber id="@nameof(gameCard.Health)" @bind-Value="gameCard.Health" class="form-control" min="1" max="12" title="@nameof(gameCard.Health)"></InputNumber>
+                    </span>
+                    <span class="button-bar d-flex justify-content-between align-items-center gap-1">
+                        <button type="submit" class="bi bi-floppy btn btn-primary rounded-circle zoom-in"></button>
+                        <button type="button" class="bi bi-x-lg btn btn-secondary rounded-circle zoom-in" @onclick="CancelEditClick"></button>
+                    </span>
+                </div>
+            }
+        </div>
+    </EditForm>
+}
+else {
+    <div class="game-card zoom-card card-shadow card border-0 @((NewlyCreated ? "new-card" : ""))" style="background-image: url('@gameCard.Image');">
+        @if (ShowLoadingSpinner)
+        {
+            <LoadingSpinner IsVisible=@ShowLoadingSpinner />
+        }
+        else
+        {
+            @if (ShowDeleteConfirm || ShowRegenConfirm)
+            {
+                <ConfirmDialog 
+                    Message=@(ShowDeleteConfirm ? "Delete this card?" : "Regenerate this image?")
+                    IsVisible="true"
+                    OnConfirmClick="OnConfirmClickHandler"
+                    OnCancelClick="OnCancelClickHandler"
+                    OnMouseLeave="OnMouseLeaveHandler"
+                />
+            }
+            else
+            {
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <span class="text-white fw-bold fs-4 text-shadow">
+                        @gameCard.Name
+                    </span>
+                    <span class="text-white fw-bold fs-3 text-shadow">
+                        @gameCard.Cost
+                    </span>
+                </div>
+                <div class="card-body p-2 text-wrap overflow-hidden flex-grow-1">
+                    <span class="card-text text-white fs-5 text-shadow p-1">
+                        @gameCard.Description
+                    </span>
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center gap-2">
+                    <span class="card-text text-white fs-5 text-shadow p-1">
+                        @gameCard.Family
+                    </span>
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <span class="text-white fw-bold fs-3 text-shadow">
+                        @gameCard.Attack/@gameCard.Health
+                    </span>
+                    <span class="button-bar d-flex justify-content-between align-items-center gap-1">
+                        <button type="button" class="btn btn-danger bi bi-trash rounded-pill text-white zoom-in" @onclick="DeleteClick"></button>
+                        <button type="submit" class="btn btn-secondary bi bi-arrow-clockwise rounded-circle text-white zoom-in" @onclick="RegenImageClick"></button>
+                        <button type="submit" class="btn btn-primary bi bi-pencil rounded-circle text-white zoom-in" @onclick="EditClick"></button>
+                    </span>
+                </div>
+            }
+        }
+    </div>
+}
+
+
+@code {
+
+    [Parameter]
+    public bool NewlyCreated { get; set; } = false;
+
+    public bool ShowLoadingSpinner { get; set; } = false;
+
+    public bool ShowDeleteConfirm { get; set; } = false;
+
+    public bool ShowRegenConfirm { get; set; } = false;
+
+    [Parameter]
+    public bool EditMode { get; set; } = false;
+
+    [Parameter]
+    public int? Id { get; set; } = null;
+
+    [Parameter]
+    public Card gameCard { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<bool> OnUpdate { get; set; }
+
+    [Parameter]
+    public EventCallback<Card> OnCreate { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnCancelEdit { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnEditClick { get; set; }
+
+    [Parameter]
+    public EventCallback<Card> OnDeleteClick { get; set; }
+
+    [Parameter]
+    public EventCallback<Card> OnCardImageUpdated { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnError { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        gameCard.NewImageCreated = false;
+    }
+
+    private async Task EditClick()
+    {
+        await OnEditClick.InvokeAsync(gameCard.Id);
+    }
+
+    private void RegenImageClick()
+    {
+        ShowRegenConfirm = true;
+    }
+
+    private void DeleteClick()
+    {
+        ShowDeleteConfirm = true;
+    }
+
+    private async Task OnConfirmClickHandler()
+    {
+        if (ShowDeleteConfirm)
+        {
+            ShowDeleteConfirm = false;
+            await DeleteCard();
+        }
+        if (ShowRegenConfirm)
+        {
+            ShowRegenConfirm = false;
+            await RegenImage();
+        }
+    }
+
+    private void OnMouseLeaveHandler()
+    {
+        OnCancelClickHandler();
+    }
+
+    private void OnCancelClickHandler()
+    {
+        ShowDeleteConfirm = false;
+        ShowRegenConfirm = false;
+    }
+
+    private async Task DeleteCard() {
+        try
+        {
+            await CardService.DeleteCardByIdAsync(gameCard.Id);
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+        finally
+        {
+            if (!string.IsNullOrEmpty(gameCard.Image))
+            {
+                var success = await ImageService.DeleteImageAsync(Path.GetFileName(gameCard.Image));
+                if (!success)
+                    Console.WriteLine("Image could not be deleted.");
+            }
+
+            await OnDeleteClick.InvokeAsync(gameCard);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        ShowLoadingSpinner = true;
+        try
+        {
+            if (Id is not null)
+            {
+                await CardService.UpdateCardAsync(gameCard);
+                await OnUpdate.InvokeAsync(true);
+            }
+            else
+            {
+                string imageFilePath = await GenerateCardImage(gameCard);
+                gameCard.Image = imageFilePath;
+                gameCard.NewImageCreated = true;
+                await CardService.AddCardAsync(gameCard);
+
+                await OnCreate.InvokeAsync(gameCard);
+            }
+        }
+        catch(Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+        finally
+        {
+            ShowLoadingSpinner = false;
+        }
+    }
+
+    private async Task RegenImage()
+    {
+        ShowLoadingSpinner = true;
+        var cardImage = gameCard.Image;
+        try
+        {
+            string imageFilePath = await GenerateCardImage(gameCard);
+            if (!string.IsNullOrEmpty(imageFilePath))
+            {
+                gameCard.Image = imageFilePath;
+                gameCard.NewImageCreated = true;
+                await CardService.UpdateCardAsync(gameCard);
+
+                await OnCardImageUpdated.InvokeAsync(gameCard);
+
+                if (!string.IsNullOrEmpty(cardImage))
+                {
+                    var success = await ImageService.DeleteImageAsync(Path.GetFileName(cardImage));
+                    if (!success)
+                        Console.WriteLine("Image could not be deleted.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
+        finally
+        {
+            ShowLoadingSpinner = false;
+        }
+    }
+
+    private async Task<string> GenerateCardImage(Card gameCard)
+    {
+        var prompt = "Generate an artistic image in the style of Midjourney." +
+                    "Absolutely NO text or labels whatsoever should appear on the image. " +
+                    // "The background of the image should be themed to match the Family Type. " +
+                    "The image is of a character described as the following: " +
+                    "Name: " + gameCard.Name +
+                    "Family type: " + gameCard.Family +
+                    "Description: " + gameCard.Description;
+
+        Result<string> result = await OpenAIService.GenerateImageAsync(prompt);
+
+        if (result.IsSuccess)
+        {
+            string imageUrl = result.Value;
+            string saveAsFileName = $"{Guid.NewGuid().ToString()}.png";
+            string savedImagePath = await ImageService.SaveImageFromUrlAsync(imageUrl, saveAsFileName);
+            return savedImagePath;
+        }
+        else
+        {
+            await OnError.InvokeAsync(result.Error);
+            return string.Empty;
+        }
+    }
+
+    private async void CancelEditClick()
+    {
+        await OnCancelEdit.InvokeAsync(Id is null);
+    }
+
+    private void ResetForm()
+    {
+        Id = null;
+        gameCard = new Card();
+        ShowDeleteConfirm = false;
+        StateHasChanged();
+    }
+}
