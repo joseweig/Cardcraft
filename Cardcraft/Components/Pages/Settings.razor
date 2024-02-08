@@ -2,8 +2,8 @@
 @rendermode InteractiveServer
 @inject ApiKeyService apiKeyService
 
-<label class="fw-bold">API Key</label>
-<input @bind="apiKey" @oninput="HandleInputChange" class="w-100" />
+<label for="apiKey" class="form-label fw-bold">API Key</label>
+<input type="password" class="form-control" id="apiKey" @bind="apiKey" @oninput="HandleInputChange" />
 <div>
     <div class="text-muted pt-3">
         Cardcraft uses OpenAI's Dall-E-3 model to create background art for cards, therefore an OpenAI API Key is required. Although API Keys are securely stored in memory, you will need to supply your key on every session.
