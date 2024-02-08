@@ -20,15 +20,15 @@ namespace Cardcraft.Data.Models
 
         [Required]
         [Range(0, 12, ErrorMessage = "Value must be between 0 and 10.")]
-        public int Cost { get; set; }
+        public int Cost { get; set; } = 1;
 
         [Required]
         [Range(0, 12, ErrorMessage = "Value must be between 0 and 10.")]
-        public int Attack { get; set; }
+        public int Attack { get; set; } = 1;
 
         [Required]
         [Range(1, 12, ErrorMessage = "Value must be between 1 and 10.")]
-        public int Health { get; set; }
+        public int Health { get; set; } = 1;
 
         public string? Image { get; set; }
 
