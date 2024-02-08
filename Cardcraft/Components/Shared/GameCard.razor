@@ -127,12 +127,6 @@ else {
     public bool EditMode { get; set; } = false;
 
     [Parameter]
-    public int? Id { get; set; } = null;
-
-    [Parameter]
-    public Card gameCard { get; set; } = new();
-
-    [Parameter]
     public EventCallback<bool> OnUpdate { get; set; }
 
     [Parameter]
@@ -152,6 +146,23 @@ else {
 
     [Parameter]
     public EventCallback<string> OnError { get; set; }
+
+    [Parameter]
+    public int? Id { get; set; }
+
+    public Card gameCard { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var card = await CardService.GetCardByIdAsync(Id);
+            if (card is not null)
+            {
+                gameCard = card;
+            }
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

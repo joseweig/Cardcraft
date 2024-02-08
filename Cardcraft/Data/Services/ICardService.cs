@@ -6,7 +6,7 @@ namespace Cardcraft.Data.Services
     {
         Task<IEnumerable<Card>> GetAllCardsAsync();
 
-        Task<Card?> GetCardByIdAsync(int id);
+        Task<Card?> GetCardByIdAsync(int? id);
 
         Task<Card?> AddCardAsync(Card card);
 

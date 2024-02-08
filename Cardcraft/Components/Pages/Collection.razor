@@ -44,7 +44,6 @@ else
                         <GameCard 
                             EditMode="true" 
                             Id="card.Id" 
-                            gameCard="card"
                             OnUpdate="OnUpdateHandler"
                             OnCreate="OnCreateHandler"
                             OnCancelEdit="OnCancelEditHandler"
@@ -56,7 +55,6 @@ else
                         <GameCard 
                             EditMode="false"
                             Id="card.Id"
-                            gameCard="card"
                             NewlyCreated="@card.NewImageCreated"
                             OnEditClick="OnEditClickHandler" 
                             OnDeleteClick="OnDeleteClickHandler"
@@ -129,7 +127,7 @@ else
             var cardToDelete = cardCollection?.FirstOrDefault(card => card.Id == gameCard.Id);
             if (cardToDelete is not null)
             {
-                cardCollection?.Remove(gameCard);
+                cardCollection?.Remove(cardToDelete);
             }
         }
     }

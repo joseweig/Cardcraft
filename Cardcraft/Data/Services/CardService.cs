@@ -18,7 +18,7 @@ namespace Cardcraft.Data.Services
             return await context.Cards.OrderByDescending(c => c.Id).ToListAsync();
         }
 
-        public async Task<Card?> GetCardByIdAsync(int id)
+        public async Task<Card?> GetCardByIdAsync(int? id)
         {
             using var context = await _dbContextFactory.CreateDbContextAsync();
             return await context.Cards.FirstOrDefaultAsync(c => c.Id == id);
