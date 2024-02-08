@@ -14,4 +14,4 @@ A project made in Blazor SSR for learning. A simple card creation game that uses
 
 # Demo
 
-Coming soon
+https://cardcraft.azurewebsites.net/
