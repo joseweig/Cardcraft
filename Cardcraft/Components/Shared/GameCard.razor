@@ -7,7 +7,7 @@
 {
     <EditForm Model="gameCard" FormName="EditCardForm" OnValidSubmit="@HandleValidSubmit">
         <DataAnnotationsValidator />
-        <div class="game-card edit-card card-shadow zoom-card card border-0" style="background-image: url('@gameCard.Image');">
+        <div class="game-card edit-card card-shadow card border-0" style="background-image: url('@gameCard.Image');">
             @if (ShowLoadingSpinner)
             {
                 <LoadingSpinner IsVisible=@ShowLoadingSpinner />
@@ -59,7 +59,7 @@
     </EditForm>
 }
 else {
-    <div class="game-card zoom-card card-shadow card border-0 @((NewlyCreated ? "new-card" : ""))" style="background-image: url('@gameCard.Image');">
+    <div class="game-card card-shadow card border-0 @((NewlyCreated ? "new-card" : ""))" style="background-image: url('@gameCard.Image');">
         @if (ShowLoadingSpinner)
         {
             <LoadingSpinner IsVisible=@ShowLoadingSpinner />
