@@ -159,8 +159,8 @@ input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
 }
 
-.game-card input[type="number"] {
-    text-align: right;
+.game-card .number-select {
+/*    text-align: right;*/
     width: 42px;
 }
 

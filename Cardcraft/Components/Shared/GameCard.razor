@@ -16,7 +16,12 @@
             {
                 <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center gap-2">
                     <InputText id="@nameof(gameCard.Name)" @bind-Value="gameCard.Name" class="form-control" placeholder="@nameof(gameCard.Name)" title="@nameof(gameCard.Name)"></InputText>
-                    <InputNumber @bind-Value="gameCard.Cost" class="form-control" min="0" max="12" title="@nameof(gameCard.Cost)"></InputNumber>
+                    <InputSelect id="@nameof(gameCard.Cost)" @bind-Value="gameCard.Cost" class="form-control number-select" title="@nameof(gameCard.Cost)">
+                        @for (int i = 1; i <= 12; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </InputSelect>
                 </div>
                 <div class="card-body text-wrap overflow-hidden flex-fill bg-transparent">
                     <InputTextArea id="@nameof(gameCard.Description)" @bind-Value="gameCard.Description" class="form-control h-100" placeholder="@nameof(gameCard.Description)" style="resize: none;" />
@@ -31,8 +36,18 @@
                 </div>
                 <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center gap-2">
                     <span class="text-white fw-bold fs-3 text-shadow d-flex justify-content-between align-items-center gap-2">
-                        <InputNumber id="@nameof(gameCard.Attack)" @bind-Value="gameCard.Attack" class="form-control" min="0" max="12" title="@nameof(gameCard.Attack)"></InputNumber>
-                        <InputNumber id="@nameof(gameCard.Health)" @bind-Value="gameCard.Health" class="form-control" min="1" max="12" title="@nameof(gameCard.Health)"></InputNumber>
+                        <InputSelect id="@nameof(gameCard.Attack)" @bind-Value="gameCard.Attack" class="form-control number-select" title="@nameof(gameCard.Attack)">
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </InputSelect>
+                        <InputSelect id="@nameof(gameCard.Health)" @bind-Value="gameCard.Health" class="form-control number-select" title="@nameof(gameCard.Health)">
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </InputSelect>
                     </span>
                     <span class="button-bar d-flex justify-content-between align-items-center gap-1">
                         <button type="submit" class="bi bi-floppy btn btn-primary rounded-circle zoom-in"></button>
