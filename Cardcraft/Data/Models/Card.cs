@@ -9,7 +9,7 @@ namespace Cardcraft.Data.Models
         public int Id { get; set; }
 
         [Required]
-        [StringLength(15, ErrorMessage = "Name is too long.")]
+        [StringLength(20, ErrorMessage = "Name is too long.")]
         public string? Name { get; set; }
 
         [Required]
