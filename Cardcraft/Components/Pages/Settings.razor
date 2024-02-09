@@ -2,6 +2,8 @@
 @rendermode InteractiveServer
 @inject ApiKeyService apiKeyService
 
+<PageTitle>CardCraft - Settings</PageTitle>
+
 <label for="apiKey" class="form-label fw-bold">API Key</label>
 <input type="password" class="form-control" id="apiKey" @bind="apiKey" @oninput="HandleInputChange" />
 <div>

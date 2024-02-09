@@ -2,9 +2,9 @@
 @page "/collection"
 @inject ICardService cardService
 @inject ToastService toastService
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@rendermode InteractiveServer
 
-<PageTitle>Collection</PageTitle>
+<PageTitle>CardCraft - Collection</PageTitle>
 
 @if (cardCollection is null)
 {
