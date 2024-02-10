@@ -190,6 +190,7 @@ else {
         {
             ShowDeleteConfirm = false;
             await DeleteCard();
+            // await ArchiveCard();
         }
         if (ShowRegenConfirm)
         {
@@ -207,6 +208,20 @@ else {
     {
         ShowDeleteConfirm = false;
         ShowRegenConfirm = false;
+    }
+
+    private async Task ArchiveCard()
+    {
+        try
+        {
+            gameCard.IsActive = false;
+            await CardService.UpdateCardAsync(gameCard);
+            await OnDeleteClick.InvokeAsync(gameCard);
+        }
+        catch (Exception ex)
+        {
+            await OnError.InvokeAsync(ex.Message);
+        }
     }
 
     private async Task DeleteCard() {

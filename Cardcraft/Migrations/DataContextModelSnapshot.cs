@@ -47,50 +47,12 @@ namespace Cardcraft.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(15)
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.ToTable("Cards");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Attack = 3,
-                            Cost = 0,
-                            Description = "An unemployed programmer.",
-                            Family = 0,
-                            Health = 2,
-                            Image = "images/buff_programmer.png",
-                            IsActive = false,
-                            Name = "Mayo"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Attack = 1,
-                            Cost = 0,
-                            Description = "A tiny berserker chihuahua.",
-                            Family = 3,
-                            Health = 1,
-                            Image = "images/boloberto.png",
-                            IsActive = false,
-                            Name = "Bolo"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Attack = 2,
-                            Cost = 0,
-                            Description = "An tall exotic voluptuous woman.",
-                            Family = 0,
-                            Health = 3,
-                            Image = "images/exotic_island_girl.png",
-                            IsActive = false,
-                            Name = "Cami"
-                        });
                 });
 #pragma warning restore 612, 618
         }
