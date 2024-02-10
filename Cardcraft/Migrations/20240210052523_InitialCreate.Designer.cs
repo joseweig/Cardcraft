@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cardcraft.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240119054639_AddCardImageField")]
-    partial class AddCardImageField
+    [Migration("20240210052523_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,8 @@ namespace Cardcraft.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(150)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Family")
@@ -43,44 +45,17 @@ namespace Cardcraft.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.ToTable("Cards");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Attack = 1,
-                            Cost = 0,
-                            Description = "An unemployed programmer.",
-                            Family = 0,
-                            Health = 1,
-                            Name = "Mayo"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Attack = 3,
-                            Cost = 0,
-                            Description = "A tiny berserker chihuahua.",
-                            Family = 3,
-                            Health = 2,
-                            Name = "Bolo"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Attack = 2,
-                            Cost = 0,
-                            Description = "An tall exotic voluptuous woman.",
-                            Family = 0,
-                            Health = 3,
-                            Name = "Cami"
-                        });
                 });
 #pragma warning restore 612, 618
         }
